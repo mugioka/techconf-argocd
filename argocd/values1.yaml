@@ -24,7 +24,7 @@ server:
         recurse: true
     destination:
       server: https://kubernetes.default.svc
-      namespace: lunar
+      namespace:
     syncPolicy:
       automated:
         prune: true

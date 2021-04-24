@@ -11,7 +11,7 @@ server:
           clientID:
           clientSecret:
           groups:
-          - tech/lunar
+          -
 
   additionalProjects:
   - name: sample
@@ -38,7 +38,7 @@ server:
         recurse: true
     destination:
       server: https://kubernetes.default.svc
-      namespace: lunar
+      namespace:
     syncPolicy:
       automated:
         prune: true
