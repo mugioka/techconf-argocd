@@ -24,7 +24,7 @@ server:
   logFormat: json
 
   config:
-    url: https://argo-cd.weseek.co.jp
+    url:
     statusbadge.enabled: "true"
     admin.enabled: "false"
     dex.config: |
