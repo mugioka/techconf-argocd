@@ -1,31 +1,5 @@
-fullnameOverride: ''
-controller:
-  logFormat: json
-repoServer:
-  logFormat: json
-  volumes:
-  - name: custom-tools
-    emptyDir: {}
-  volumeMounts:
-  - name: custom-tools
-    mountPath: /usr/local/bin/helmfile
-    subPath: helmfile
-  initContainers:
-  - name: download-tools
-    image: alpine:3.8
-    command: [sh, -c]
-    args:
-    - wget -qO /custom-tools/helmfile https://github.com/roboll/helmfile/releases/download/v0.135.0/helmfile_linux_amd64;
-      chmod +x /custom-tools/*
-    volumeMounts:
-    - mountPath: /custom-tools
-      name: custom-tools
 server:
-  logFormat: json
-
   config:
-    url:
-    statusbadge.enabled: "true"
     admin.enabled: "false"
     dex.config: |
       connectors:
@@ -38,21 +12,6 @@ server:
           clientSecret:
           groups:
           - tech/lunar
-    repositories: |
-      - url:
-        usernameSecret:
-          name:
-          key:
-        passwordSecret:
-          name:
-          key:
-    configManagementPlugins: |
-      - name: helmfile
-        generate:
-          command: [sh, -c]
-          args: 
-          - helmfile repos;
-            helmfile template --skip-deps
 
   rbacConfig:
     policy.default: role:default

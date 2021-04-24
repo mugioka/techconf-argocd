@@ -1,0 +1,32 @@
+server:
+  additionalProjects:
+  - name: sample
+    namespace: argocd
+    description: Project sample.
+    sourceRepos:
+    - '*'
+    clusterResourceWhitelist:
+    - group: '*'
+      kind: '*'
+    destinations:
+    - namespace: default
+      server: https://kubernetes.default.svc
+
+  additionalApplications:
+  - name: nginx-with-plain-yaml
+    namespace: argocd
+    project: sample
+    source:
+      repoURL:
+      targetRevision: master
+      path:
+      directory:
+        recurse: true
+    destination:
+      server: https://kubernetes.default.svc
+      namespace: lunar
+    syncPolicy:
+      automated:
+        prune: true
+  ingress:
+    enabled: false
