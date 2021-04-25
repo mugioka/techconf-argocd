@@ -1,0 +1,11 @@
+apiVersion: v1
+kind: Service
+metadata:
+  name: nginx-with-plain-yaml
+spec:
+  selector:
+    app: nginx-with-plain-yaml
+  ports:
+  - name: nginx
+    protocol: TCP
+    port: 80
