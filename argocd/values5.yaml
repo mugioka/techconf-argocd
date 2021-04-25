@@ -5,6 +5,25 @@ controller:
   # Polling time to a specific Git repositories.
   appResyncPeriod: 10
 
+repoServer:
+  volumes:
+  - name: custom-tools
+    emptyDir: {}
+  volumeMounts:
+  - name: custom-tools
+    mountPath: /usr/local/bin/helmfile
+    subPath: helmfile
+  initContainers:
+  - name: download-tools
+    image: alpine:3.8
+    command: [sh, -c]
+    args:
+    - wget -qO /custom-tools/helmfile https://github.com/roboll/helmfile/releases/download/v0.138.7/helmfile_linux_amd64;
+      chmod +x /custom-tools/*
+    volumeMounts:
+    - mountPath: /custom-tools
+      name: custom-tools
+
 server:
   config:
     url: http://argocd.example.net
@@ -20,6 +39,14 @@ server:
           clientSecret: Your clientSecret.
           orgs:
           - name: mugioka-org
+    configManagementPlugins: |
+      - name: helmfile
+        generate:
+          command: [sh, -c]
+          args: 
+          - helmfile repos;
+            helmfile template --skip-deps
+
 
   rbacConfig:
     policy.default: role:readonly
@@ -56,6 +83,22 @@ server:
       repoURL: https://github.com/MugiOka/techconf-argocd.git
       targetRevision: master
       path: nginx-with-plain-manifests
+    destination:
+      server: https://kubernetes.default.svc
+      namespace: nginx
+    syncPolicy:
+      automated:
+        prune: true
+
+  - name: nginx-with-helmfile
+    namespace: argocd
+    project: weseek-techconf
+    source:
+      repoURL: https://github.com/MugiOka/techconf-argocd.git
+      targetRevision: master
+      path: nginx-with-helmfile
+      plugin:
+        name: helmfile
     destination:
       server: https://kubernetes.default.svc
       namespace: nginx

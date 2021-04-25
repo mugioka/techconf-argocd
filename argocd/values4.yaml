@@ -18,7 +18,7 @@ repoServer:
     image: alpine:3.8
     command: [sh, -c]
     args:
-    - wget -qO /custom-tools/helmfile https://github.com/roboll/helmfile/releases/download/v0.135.0/helmfile_linux_amd64;
+    - wget -qO /custom-tools/helmfile https://github.com/roboll/helmfile/releases/download/v0.138.7/helmfile_linux_amd64;
       chmod +x /custom-tools/*
     volumeMounts:
     - mountPath: /custom-tools
@@ -26,27 +26,19 @@ repoServer:
 
 server:
   config:
-    url:
-    admin.enabled: "false"
+    url: http://argocd.example.net
+    # see: https://argoproj.github.io/argo-cd/operator-manual/user-management/#1-register-the-application-in-the-identity-provider
     dex.config: |
       connectors:
-      - type: gitlab
-        id: gitlab
-        name: GitLab
+      - type: github
+        id: github
+        name: GitHub
+        redirectURI: http://argocd.example.net/dex/callback
         config:
-          baseURL:
-          clientID:
-          clientSecret:
-          groups:
-          - 
-    repositories: |
-      - url:
-        usernameSecret:
-          name:
-          key:
-        passwordSecret:
-          name:
-          key:
+          clientID: Your clientID.
+          clientSecret: Your clientSecret.
+          orgs:
+          - name: mugioka-org
     configManagementPlugins: |
       - name: helmfile
         generate:
@@ -55,37 +47,45 @@ server:
           - helmfile repos;
             helmfile template --skip-deps
 
+
   rbacConfig:
-    policy.default: role:default
-    policy.csv: |
-      p, role:default, accounts, get, *, allow
+    policy.default: role:readonly
+
+    # The Custom RBAC Configuration Example.
+    # policy.csv: |
+    #   p, role:org-admin, applications, *, nginx/*, allow
+    #   p, role:org-admin, clusters, get, *, allow
+    #   p, role:org-admin, repositories, get, *, allow
+    #   p, role:org-admin, repositories, create, *, allow
+    #   p, role:org-admin, repositories, update, *, allow
+    #   p, role:org-admin, repositories, delete, *, allow
+
+    #   g, mugioka-org:example, role:org-admin
 
   additionalProjects:
-  - name: sample
+  - name: weseek-techconf
     namespace: argocd
-    description: Project sample.
+    description: Project WESEEK techconf.
     sourceRepos:
-    - '*'
+    - 'https://github.com/MugiOka/techconf-argocd.git'
     clusterResourceWhitelist:
     - group: '*'
       kind: '*'
     destinations:
-    - namespace: default
+    - namespace: nginx
       server: https://kubernetes.default.svc
 
   additionalApplications:
-  - name: nginx-with-plain-yaml
+  - name: nginx-with-plain-manifests
     namespace: argocd
-    project: sample
+    project: weseek-techconf
     source:
-      repoURL:
+      repoURL: https://github.com/MugiOka/techconf-argocd.git
       targetRevision: master
-      path:
-      directory:
-        recurse: true
+      path: nginx-with-plain-manifests
     destination:
       server: https://kubernetes.default.svc
-      namespace: lunar
+      namespace: nginx
     syncPolicy:
       automated:
         prune: true
