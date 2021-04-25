@@ -1,33 +1,35 @@
 # Helm v3 has removed the install-crds hook so CRDs are now populated by files in the crds directory. Users of Helm v3 should set the installCRDs value to false to avoid warnings about nonexistent webhooks.
 installCRDs: false
 
+controller:
+  # Polling time to a specific Git repositories.
+  appResyncPeriod: 10
+
 server:
   additionalProjects:
-  - name: sample
+  - name: weseek-techconf
     namespace: argocd
-    description: Project sample.
+    description: Project WESEEK techconf.
     sourceRepos:
-    - '*'
+    - 'https://github.com/MugiOka/techconf-argocd.git'
     clusterResourceWhitelist:
     - group: '*'
       kind: '*'
     destinations:
-    - namespace: default
+    - namespace: nginx
       server: https://kubernetes.default.svc
 
   additionalApplications:
   - name: nginx-with-plain-yaml
     namespace: argocd
-    project: sample
+    project: weseek-techconf
     source:
-      repoURL:
+      repoURL: https://github.com/MugiOka/techconf-argocd.git
       targetRevision: master
-      path:
-      directory:
-        recurse: true
+      path: nginx-with-plain-yaml
     destination:
       server: https://kubernetes.default.svc
-      namespace:
+      namespace: nginx
     syncPolicy:
       automated:
         prune: true
