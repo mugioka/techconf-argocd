@@ -1,10 +1,6 @@
 # Helm v3 has removed the install-crds hook so CRDs are now populated by files in the crds directory. Users of Helm v3 should set the installCRDs value to false to avoid warnings about nonexistent webhooks.
 installCRDs: false
 
-controller:
-  # Polling time to a specific Git repositories.
-  appResyncPeriod: 1
-
 repoServer:
   volumes:
   - name: custom-tools
