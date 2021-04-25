@@ -4,7 +4,6 @@ repositories:
 
 releases:
 - name: nginx-with-helmfile
-  namespace: nginx
   chart: bitnami/nginx
   values:
   - values.yaml
