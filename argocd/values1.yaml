@@ -3,7 +3,7 @@ installCRDs: false
 
 controller:
   # Polling time to a specific Git repositories.
-  appResyncPeriod: 10
+  appResyncPeriod: 1
 
 server:
   additionalProjects:
